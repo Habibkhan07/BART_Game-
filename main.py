@@ -7,12 +7,11 @@ from io import StringIO
 POINTS_PER_PUMP = 5
 TOTAL_TRIALS = 7
 
-# New constants for the increasing risk model:
-# The values below represent the *max* number of pumps a balloon can hold.
+
 MAX_PUMPS_MAP = {
-    'Yellow': 8,    # High Risk -> Max 8 pumps (original probability 1/8)
-    'Orange': 16,   # Moderate Risk -> Max 16 pumps (original probability 1/16)
-    'Blue': 64      # Low Risk -> Max 64 pumps (original probability 1/64)
+    'Yellow': 8,
+    'Orange': 16,   
+    'Blue': 64     
 }
 
 DEPARTMENTS = [
@@ -54,15 +53,12 @@ def setup_new_trial():
     if st.session_state['current_trial'] <= TOTAL_TRIALS:
         current_color = st.session_state['balloon_colors_sequence'][st.session_state['current_trial'] - 1]
         st.session_state['max_pumps_this_trial'] = MAX_PUMPS_MAP[current_color]
-        # In a real BART, max_pumps can sometimes be randomized (e.g., from 1 to 128) 
-        # but here we use the fixed values corresponding to the risk levels.
 
 def next_trial():
     """Records the outcome and prepares state for the next balloon/trial."""
     current_color = st.session_state['balloon_colors_sequence'][st.session_state['current_trial'] - 1]
     
-    # 1. Record data for the finished trial
-    # Check explosion state based on how we left the game_page/explosion_page
+   
     is_exploded = 0
     if st.session_state['page'] == 'explosion':
         is_exploded = 1
@@ -116,14 +112,7 @@ def handle_pump():
     if current_pumps >= max_pumps:
         st.session_state['page'] = 'explosion'
     else:
-        # The probability of explosion increases with each pump: 
-        # probability = 1 / (Maximum Pumps - Current Pumps + 1)
-        # The '+ 1' ensures the denominator starts higher than 0 when current_pumps = max_pumps - 1
-        # Example: if max=8, pump=1, prob = 1/(8-1) = 1/7
-        # Example: if max=8, pump=7, prob = 1/(8-7) = 1/1
-        
-        # We will use the formula 1 / (Max_Pumps - Current_Pumps + 1) for a slightly smoother curve
-        # and ensure a pop at exactly Max_Pumps
+    
         prob_explosion = 1 / (max_pumps - current_pumps + 1)
         
         # Check for explosion based on this increasing random chance
@@ -365,10 +354,11 @@ def main():
     elif st.session_state['page'] == 'explosion':
         explosion_page()
     elif st.session_state['page'] == 'game_over_explosion':
-        # This is a critical state to ensure the explosion event is recorded before continuing
+        
         explosion_page() 
     elif st.session_state['page'] == 'end':
         end_page()
 
 if __name__ == "__main__":
     main()
+
